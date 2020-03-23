@@ -1,8 +1,91 @@
+import Link from 'next/link';
 
-function Channel(){
+function Channel( { channel, audioClips, series } ){
+    const { title } = channel;
     return(
-        <h1>Vista de canals</h1>
+        <>
+            <Link href="/">   
+                <a>
+                    <header className="header">Podcast</header>
+                </a>
+            </Link>
+            <h1>{title}</h1>
+
+            <figure className="channelImg">
+                <img src={channel.urls.logo_image.original} />
+            </figure>
+
+            <h2>Series</h2>
+            <ul>
+                {series.map((serie) => (
+                    <li>{serie.title}</li>
+                ))}
+            </ul>
+
+            <h2>Ultimos Podcasts</h2>
+            <ul>
+                {audioClips.map( (clip) =>(
+                    <li>{clip.title}</li>
+                ))}
+            </ul>
+
+            <style jsx>{`
+                .header{
+                    color: #fff;
+                    background: #8756ca;
+                    padding: 15px;
+                }
+                .channel{
+                    display: block;
+                    border-radius: 3px;
+                    box-shadow: 0 2px 6px rgba(0,0.0.0.15);
+                    margin-bottom: 0.5em;
+                }
+                .channels{
+                    display: grid;
+                    grid-gap: 15px;
+                    padding: 15px;
+                    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                }
+                .channelImg img{
+                    width: 100%;
+                }
+                .channel-title{
+                    padding: 5px;
+                    font-size: 0.9em;
+                    font-weight: 600;
+                    margin: 0;
+                    text-align: center;
+                }
+            `}</style>
+            <style jsx global>{`
+                body{
+                    text-align: center;                    
+                    margin: 0;
+                    font-family: system-ui;
+                    background: white;
+                }
+            `}</style>
+        </>
     )
+}
+
+Channel.getInitialProps = async ({ query }) => {
+    let idChannel = query.id;
+    let requestChannel = await fetch(`https://api.audioboom.com/channels/${idChannel}`);
+    let dataChannel = await requestChannel.json();
+    let channel = dataChannel.body.channel;
+
+    let requestAudios = await fetch(`https://api.audioboom.com/channels/${idChannel}/audio_clips`);
+    let dataAudios = await requestAudios.json();
+    let audioClips = dataAudios.body.audio_clips;
+
+    let requestSeries = await fetch(`https://api.audioboom.com/channels/${idChannel}/child_channels`);
+    let dataSeries = await requestSeries.json();
+    let series = dataSeries.body.channels;
+    console.log(series);
+
+    return { channel, audioClips, series}
 }
 
 export default Channel;
