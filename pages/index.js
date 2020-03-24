@@ -8,7 +8,7 @@ function Page ({ channels }){
 
             <div className="channels">
                 {channels.map( (channel) => (
-                    <Link href={`/channel?id=${channel.id}`} prefetch>
+                    <Link href={`/Podcasts?id=${channel.id}`} prefetch>
                         <a className="channel">
                             <img src={channel.urls.logo_image.original} alt=""/>
                             <h2 className="channel-title">{channel.title}</h2>
