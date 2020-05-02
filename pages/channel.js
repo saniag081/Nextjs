@@ -1,14 +1,11 @@
 import Link from 'next/link';
+import Layout from '../componetns/Layout'
 
 function Channel( { channel, audioClips, series } ){
     const { title } = channel;
-    return(
-        <>
-            <Link href="/">   
-                <a>
-                    <header className="header">Podcast</header>
-                </a>
-            </Link>
+    return (
+
+        <Layout title="Channel">
             <h1>{title}</h1>
 
             <figure className="channelImg">
@@ -60,13 +57,13 @@ function Channel( { channel, audioClips, series } ){
             `}</style>
             <style jsx global>{`
                 body{
-                    text-align: center;                    
+                    text-align: center;
                     margin: 0;
                     font-family: system-ui;
                     background: white;
                 }
             `}</style>
-        </>
+        </Layout>
     )
 }
 
