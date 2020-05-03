@@ -1,8 +1,12 @@
 import Link from 'next/link';
-import Layout from '../componetns/Layout'
+import Layout from '../componetns/Layout';
+import Error from 'next/error';
 
-function Channel( { channel, audioClips, series } ){
+function Channel( { channel, audioClips, series, statusCode} ){
     const { title } = channel;
+    if (statusCode !== 200) {
+        return <Error statusCode={ statusCode }/>
+    }
     return (
 
         <Layout title="Channel">
@@ -27,11 +31,6 @@ function Channel( { channel, audioClips, series } ){
             </ul>
 
             <style jsx>{`
-                .header{
-                    color: #fff;
-                    background: #8756ca;
-                    padding: 15px;
-                }
                 .channel{
                     display: block;
                     border-radius: 3px;
@@ -69,23 +68,27 @@ function Channel( { channel, audioClips, series } ){
 
 Channel.getInitialProps = async ({ query }) => {
     let idChannel = query.id;
-    let [requestChannel, requestAudios, requestSeries] = await Promise.all([
-        fetch(`https://api.audioboom.com/channels/${idChannel}`),
-        fetch(`https://api.audioboom.com/channels/${idChannel}/audio_clips`),
-        fetch(`https://api.audioboom.com/channels/${idChannel}/child_channels`),
-    ])
+    try {
+        let [requestChannel, requestAudios, requestSeries] = await Promise.all([
+            fetch(`https://api.audioboom.com/channels/${idChannel}`),
+            fetch(`https://api.audioboom.com/channels/${idChannel}/audio_clips`),
+            fetch(`https://api.audioboom.com/channels/${idChannel}/child_channels`),
+        ])
 
-    let dataChannel = await requestChannel.json();
-    let channel = dataChannel.body.channel;
+        let dataChannel = await requestChannel.json();
+        let channel = dataChannel.body.channel;
 
-    let dataAudios = await requestAudios.json();
-    let audioClips = dataAudios.body.audio_clips;
+        let dataAudios = await requestAudios.json();
+        let audioClips = dataAudios.body.audio_clips;
 
-    let dataSeries = await requestSeries.json();
-    let series = dataSeries.body.channels;
-    console.log(series);
+        let dataSeries = await requestSeries.json();
+        let series = dataSeries.body.channels;
+        console.log(series);
 
-    return { channel, audioClips, series}
+        return { channel, audioClips, series, statusCode: 200}
+    } catch (e) {
+        return { statusCode: 500}
+    }
 }
 
 export default Channel;

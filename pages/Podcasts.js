@@ -2,32 +2,57 @@
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Channel from "../components/Channel"
+import Error from "next/error"
 
-function Podcasts({ channel, audio  }) {
-    return(
-        <Layout title={ channel.title }>
-            <Channel channel={channel} audio={ audio }>
-            </Channel>
-        </Layout>
+function Podcasts({ channel, audio , statusCode}) {
+    if (statusCode !== 200) {
+        return <Error statusCode={ statusCode }></Error>
+    }
+    return (
+        <>
+            <Layout title={ channel.title }>
+                <Channel channel={channel} audio={ audio }>
+                </Channel>
+            </Layout>
+        </>
     )
 }
 
-Podcasts.getInitialProps = async ({ query }) => {
+Podcasts.getInitialProps = async ({ query, res }) => {
     let idChannel = query.id;
-    let [reqChannel, reqAudio] = await Promise.all([
-        fetch(`https://api.audioboom.com/channels/${idChannel}`),
-        fetch(`https://api.audioboom.com/audio_clips/${idChannel}.mp3`),
-    ])
+    try {
+        let [reqChannel, reqAudio] = await Promise.all([
+            fetch(`https://api.audioboom.com/channels/${idChannel}`),
+            fetch(`https://api.audioboom.com/audio_clips/${idChannel}.mp3`),
+        ])
 
-    let dataChannel = await reqChannel.json();
-    let channel = dataChannel.body.channel;
+        if (reqChannel.status >= 400) {
+            res.statusCode = reqChannel.status;
+            return {
+                channel: null,
+                audio: null,
+                statusCode: 404
+            }
+        }
 
-    let dataAudio = await reqAudio.json();
-    let audio = dataAudio.body.audio_clip;
+        let dataChannel = await reqChannel.json();
+        let channel = dataChannel.body.channel;
 
-    return{
-        channel,
-        audio
+        let dataAudio = await reqAudio.json();
+        let audio = dataAudio.body.audio_clip;
+
+        return{
+            channel,
+            audio,
+            statusCode: 200
+        }
+    } catch (e) {
+        // res.statusCode = 500;
+        return {
+            channel: null,
+            audio: null,
+            statusCode: 500
+        }
     }
 }
 
