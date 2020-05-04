@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Channel from "../components/Channel"
-import Error from "next/error"
+import Error from "./_error";
 
 function Podcasts({ channel, audio , statusCode}) {
     if (statusCode !== 200) {
