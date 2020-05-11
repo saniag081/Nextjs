@@ -9,7 +9,7 @@ function Error({ statusCode }) {
 				<div className="menssage">
 					<h1 className="title">Esta Página no existe</h1>
 					<p>
-						<Link href="">
+						<Link href="/">
 							<a className="sub-title">Volver al home</a>
 						</Link>
 					</p>
@@ -18,7 +18,7 @@ function Error({ statusCode }) {
 				<div className="menssage">
 					<h1 className="title">Hubo un problema</h1>
 					<p>
-						<Link href="">
+						<Link href="/">
 							<a className="sub-title">Intenta nueva mente en unos segundos</a>
 						</Link>
 					</p>
